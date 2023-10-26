@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { BeatLoader } from 'react-spinners';
 
 function App() {
   const [country, setCountry] = useState('');
+  const [countryData, setCountryData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
 
   const handleInputChange = (e) => {
     setCountry(e.target.value);
@@ -10,8 +15,19 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(country);
+    setLoading(true);
+    setError(null);
+    axios.get(`http://localhost:5000/country/${country}`)
+      .then(response => {
+        setCountryData(response.data[0]);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError("Error fetching data. Please try again.");
+        setLoading(false);
+      });
   };
+
 
   useEffect(() => {
     axios.get('http://localhost:5000/test')
@@ -35,8 +51,19 @@ function App() {
         />
         <button type="submit">Search</button>
       </form>
+
+      {loading && <BeatLoader color={"#123abc"} />}
+      {error && <p>{error}</p>}
+      {countryData && (
+        <div>
+          <h2>{countryData.name.common}</h2>
+          <p>Capital: {countryData.capital[0]}</p>
+          <p>Region: {countryData.region}</p>
+        </div>
+      )}
     </div>
   );
+
 }
 
 export default App;
