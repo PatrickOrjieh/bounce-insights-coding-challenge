@@ -1,23 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
 
 function App() {
+  const [country, setCountry] = useState('');
+
+  const handleInputChange = (e) => {
+    setCountry(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(country);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Country Information</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={country}
+          onChange={handleInputChange}
+          placeholder="Enter country name"
+        />
+        <button type="submit">Search</button>
+      </form>
     </div>
   );
 }
