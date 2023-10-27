@@ -28,3 +28,9 @@
   background-color: #152737;
   color: #ffffff;
 }
+
+.fixed-height-image {
+  height: 100px;
+  object-fit: cover;
+}
+

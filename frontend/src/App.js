@@ -6,10 +6,22 @@ import './App.css';
 
 function App() {
   const [country, setCountry] = useState('');
-  const [countryData, setCountryData] = useState(null);
+  const [countryData, setCountryData] = useState([]);
+  const [filters, setFilters] = useState({ language: '', region: '', subRegion: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    setFilters({
+      language: ["English", "French", "Spanish"],
+      region: ["Africa", "Asia", "Europe"],
+      subRegion: ["Western Africa", "Eastern Africa", "Southern Africa"]
+    });
+  }, []);
+
+  const handleFilterChange = (e) => {
+    setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleInputChange = (e) => {
     setCountry(e.target.value);
@@ -21,7 +33,7 @@ function App() {
     setError(null);
     axios.get(`http://localhost:5000/country/${country}`)
       .then(response => {
-        setCountryData(response.data[0]);
+        setCountryData(response.data);
         setLoading(false);
       })
       .catch(err => {
@@ -30,23 +42,16 @@ function App() {
       });
   };
 
-
-  useEffect(() => {
-    axios.get('http://localhost:5000/test')
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error("Error connecting to backend:", error);
-      });
-  }, []);
+  const handleCountryClick = (country) => {
+    console.log(country);
+  };
 
   return (
-    <div className="App" class="container-fluid">
-      <nav class="navbar">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#">
-            <img src={logo} alt="" width="60" height="60" class="d-inline-block align-text-top" /> &nbsp;
+    <div className="App container-fluid">
+      <nav className="navbar">
+        <div className="container-fluid">
+          <a className="navbar-brand" href="#">
+            <img src={logo} alt="" width="60" height="60" className="d-inline-block align-text-top" /> &nbsp;
             Countries Coding Challenge - Patrick Orjieh
           </a>
         </div>
@@ -56,7 +61,7 @@ function App() {
         <h2 className="display-6">Welcome to Countries Coding Challenge</h2>
         <p className="lead">Discover information about countries worldwide.</p>
         <hr className="my-4" />
-        <div class="text-center">
+        <div className="text-center">
           <p>Select a starting letter to view countries:</p>
           <div className="alphabet-list">
             {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map(letter => (
@@ -67,33 +72,69 @@ function App() {
           </div>
         </div>
       </div>
+      <hr className="my-4" />
 
-      <div>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={country}
-            onChange={handleInputChange}
-            placeholder="Enter country name"
-          />
-          <button type="submit">Search</button>
-        </form>
-      </div>
-
-
-
-      {loading && <BeatLoader color={"#123abc"} />}
-      {error && <p>{error}</p>}
-      {countryData && (
-        <div>
-          <h2>{countryData.name.common}</h2>
-          <p>Capital: {countryData.capital[0]}</p>
-          <p>Region: {countryData.region}</p>
+      <div className="row mt-4">
+        <div className="col-md-3">
+          <h5>Filters</h5>
+          <hr />
+          <div className="form-group">
+            <label>Language</label>
+            <select name="language" className="form-control" onChange={handleFilterChange}>
+              {filters.language && filters.language.map(lang => <option key={lang} value={lang}>{lang}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Region</label>
+            <select name="region" className="form-control" onChange={handleFilterChange}>
+              {filters.region && filters.region.map(region => <option key={region} value={region}>{region}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Sub Region</label>
+            <select name="subRegion" className="form-control" onChange={handleFilterChange}>
+              {filters.subRegion && filters.subRegion.map(subRegion => <option key={subRegion} value={subRegion}>{subRegion}</option>)}
+            </select>
+          </div>
         </div>
-      )}
+
+        <div className="col-md-6 text-center">
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              value={country}
+              onChange={handleInputChange}
+              placeholder="Enter country name"
+              className="form-control mb-3"
+            />
+            <button type="submit" className="btn btn-primary">Search</button>
+          </form>
+          <div className="row mt-4">
+            {countryData.map(country => (
+              <div className="col-md-4 mb-3" key={country.name.common}>
+                <div className="card h-100" onClick={() => handleCountryClick(country)}>
+                  <img
+                    src={country.flags.png}
+                    alt={`Flag of ${country.name.common}`}
+                    className="card-img-top fixed-height-image"
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title">{country.name.common}</h5>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {loading && <BeatLoader color={"#123abc"} />}
+          {error && <p>{error}</p>}
+        </div>
+
+        <div className="col-md-3"></div>
+
+      </div>
     </div>
   );
-
 }
 
 export default App;
