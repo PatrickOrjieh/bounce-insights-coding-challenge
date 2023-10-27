@@ -56,8 +56,10 @@ function App() {
         })
         .catch(err => {
           setError("Error fetching data. Please try again.");
+          setCountryData([]);  // Clear the countries data
           setLoading(false);
         });
+        
     } else {
       // Fetch specific country
       axios.get(`http://localhost:5000/country/${country}`)
@@ -67,8 +69,10 @@ function App() {
         })
         .catch(err => {
           setError("Error fetching data. Please try again.");
+          setCountryData([]);  // Clear the countries data
           setLoading(false);
         });
+        
     }
   };
 

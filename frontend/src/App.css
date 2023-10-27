@@ -72,5 +72,7 @@
 .pagination .btn-primary {
   background-color: #152737;
   color: #FFFFFF;
+  outline: none;
+  border: none;
 }
 
