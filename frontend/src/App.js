@@ -7,22 +7,12 @@ import './App.css';
 function App() {
   const [country, setCountry] = useState('');
   const [countryData, setCountryData] = useState([]);
-  const [filters, setFilters] = useState({ language: '', region: '', subRegion: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const countriesPerPage = 12;
   const [showModal, setShowModal] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
-
-
-  useEffect(() => {
-    setFilters({
-      language: ["English", "French", "Spanish"],
-      region: ["Africa", "Asia", "Europe"],
-      subRegion: ["Western Africa", "Eastern Africa", "Southern Africa"]
-    });
-  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -47,11 +37,6 @@ function App() {
   };
 
   const totalPages = Math.ceil(countryData.length / countriesPerPage);
-
-
-  const handleFilterChange = (e) => {
-    setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   const handleInputChange = (e) => {
     setCountry(e.target.value);
@@ -91,6 +76,22 @@ function App() {
     setSelectedCountry(country);
     setShowModal(true);
   };
+
+  const fetchCountriesByLetter = (letter) => {
+    setLoading(true);
+    setError(null);
+
+    axios.get(`http://localhost:5000/countriesByLetter/${letter}`)
+      .then(response => {
+        setCountryData(response.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError("Error fetching data. Please try again.");
+        setLoading(false);
+      });
+  };
+
 
   const renderModal = () => {
     if (!selectedCountry) return null;
@@ -138,7 +139,6 @@ function App() {
     );
   };
 
-
   return (
     <div className="App container-fluid">
       <nav className="navbar">
@@ -158,7 +158,11 @@ function App() {
           <p>Select a starting letter to view countries:</p>
           <div className="alphabet-list">
             {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map(letter => (
-              <button className="btn btn-outline-primary mr-2" key={letter}>
+              <button
+                className="btn btn-outline-primary mr-2"
+                key={letter}
+                onClick={() => fetchCountriesByLetter(letter)}
+              >
                 {letter}
               </button>
             ))}
@@ -167,30 +171,7 @@ function App() {
       </div>
       <hr className="my-4" />
 
-      <div className="row mt-4">
-        <div className="col-md-3">
-          <h5>Filters</h5>
-          <hr />
-          <div className="form-group">
-            <label>Language</label>
-            <select name="language" className="form-control" onChange={handleFilterChange}>
-              {filters.language && filters.language.map(lang => <option key={lang} value={lang}>{lang}</option>)}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Region</label>
-            <select name="region" className="form-control" onChange={handleFilterChange}>
-              {filters.region && filters.region.map(region => <option key={region} value={region}>{region}</option>)}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Sub Region</label>
-            <select name="subRegion" className="form-control" onChange={handleFilterChange}>
-              {filters.subRegion && filters.subRegion.map(subRegion => <option key={subRegion} value={subRegion}>{subRegion}</option>)}
-            </select>
-          </div>
-        </div>
-
+      <div className="row mt-4 justify-content-center">
         <div className="col-md-6 text-center">
           <form onSubmit={handleSubmit} className="d-flex justify-content-between">
             <div className="col-md-10 p-0">
@@ -206,6 +187,9 @@ function App() {
               <button type="submit" className="btn btn-primary ml-2 search">Search</button>
             </div>
           </form>
+
+          {loading && <BeatLoader color={"#123abc"} />}
+
 
           <div className="row mt-4">
             {currentCountries.map(country => (
@@ -225,7 +209,7 @@ function App() {
           </div>
 
           {/* Pagination Controls */}
-          <div className="pagination mt-4">
+          <div className="pagination mt-4 mb-3">
             {[...Array(totalPages)].map((e, index) => (
               <button key={index + 1} className={`btn btn-${currentPage === index + 1 ? "primary" : "outline-primary"} mr-2`} onClick={() => handlePageClick(index + 1)}>
                 {index + 1}
@@ -233,11 +217,10 @@ function App() {
             ))}
           </div>
 
-          {loading && <BeatLoader color={"#123abc"} />}
           {error && <p>{error}</p>}
         </div>
 
-        <div className="col-md-3"></div>
+        <div className="col-md-1"></div>
 
       </div>
       {renderModal()}

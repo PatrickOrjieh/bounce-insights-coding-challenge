@@ -38,6 +38,31 @@ app.get('/country/:name', (req, res) => {
         });
 });
 
+app.get('/countriesByLetter/:letter', (req, res) => {
+    const letter = req.params.letter.toUpperCase();
+
+    axios.get(`https://restcountries.com/v3.1/all`)
+        .then(response => {
+            if (response.data && response.data.length > 0) {
+                const filteredCountries = response.data.filter(country => 
+                    country.name.common.startsWith(letter)
+                );
+
+                if (filteredCountries.length > 0) {
+                    res.json(filteredCountries);
+                } else {
+                    res.status(404).json({ error: "Countries not found" });
+                }
+            } else {
+                res.status(404).json({ error: "Countries not found" });
+            }
+        })
+        .catch(error => {
+            res.status(500).json({ error: "Error fetching countries data" });
+        });
+});
+
+
 app.get('/test', (req, res) => {
     res.send('Backend connection successful!');
 });
