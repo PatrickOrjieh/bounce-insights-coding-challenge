@@ -46,3 +46,31 @@
   border: 1px solid #152737;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination .btn {
+  margin: 0 5px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination .btn:hover {
+  background-color: #152737;
+  color: #FFFFFF;
+}
+
+.pagination .btn-outline-primary {
+  background-color: #D1D1D1;
+  color: #000000;
+  outline: none;
+  border: none;
+}
+
+.pagination .btn-primary {
+  background-color: #152737;
+  color: #FFFFFF;
+}
+

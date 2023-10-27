@@ -10,6 +10,8 @@ function App() {
   const [filters, setFilters] = useState({ language: '', region: '', subRegion: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const countriesPerPage = 12;
 
   useEffect(() => {
     setFilters({
@@ -32,7 +34,17 @@ function App() {
         setLoading(false);
       });
   }, []);
-  
+
+  const indexOfLastCountry = currentPage * countriesPerPage;
+  const indexOfFirstCountry = indexOfLastCountry - countriesPerPage;
+  const currentCountries = countryData.slice(indexOfFirstCountry, indexOfLastCountry);
+
+  const handlePageClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const totalPages = Math.ceil(countryData.length / countriesPerPage);
+
 
   const handleFilterChange = (e) => {
     setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -44,6 +56,7 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setCurrentPage(1);  // Reset to the first page
     setLoading(true);
     setError(null);
     axios.get(`http://localhost:5000/country/${country}`)
@@ -130,7 +143,7 @@ function App() {
           </form>
 
           <div className="row mt-4">
-            {countryData.map(country => (
+            {currentCountries.map(country => (
               <div className="col-md-4 mb-3" key={country.name.common}>
                 <div className="card h-100" onClick={() => handleCountryClick(country)}>
                   <img
@@ -143,6 +156,15 @@ function App() {
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="pagination mt-4">
+            {[...Array(totalPages)].map((e, index) => (
+              <button key={index + 1} className={`btn btn-${currentPage === index + 1 ? "primary" : "outline-primary"} mr-2`} onClick={() => handlePageClick(index + 1)}>
+                {index + 1}
+              </button>
             ))}
           </div>
 
