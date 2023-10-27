@@ -12,6 +12,9 @@ function App() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const countriesPerPage = 12;
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
 
   useEffect(() => {
     setFilters({
@@ -59,20 +62,82 @@ function App() {
     setCurrentPage(1);  // Reset to the first page
     setLoading(true);
     setError(null);
-    axios.get(`http://localhost:5000/country/${country}`)
-      .then(response => {
-        setCountryData(response.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError("Error fetching data. Please try again.");
-        setLoading(false);
-      });
+    if (country.trim() === '') {
+      // Fetch all countries if input is empty
+      axios.get(`http://localhost:5000/allCountries`)
+        .then(response => {
+          setCountryData(response.data);
+          setLoading(false);
+        })
+        .catch(err => {
+          setError("Error fetching data. Please try again.");
+          setLoading(false);
+        });
+    } else {
+      // Fetch specific country
+      axios.get(`http://localhost:5000/country/${country}`)
+        .then(response => {
+          setCountryData(response.data);
+          setLoading(false);
+        })
+        .catch(err => {
+          setError("Error fetching data. Please try again.");
+          setLoading(false);
+        });
+    }
   };
 
   const handleCountryClick = (country) => {
-    console.log(country);
+    setSelectedCountry(country);
+    setShowModal(true);
   };
+
+  const renderModal = () => {
+    if (!selectedCountry) return null;
+
+    return (
+      <div className={`modal ${showModal ? 'show' : ''}`} tabIndex="-1" style={{ display: `${showModal ? 'block' : 'none'}` }}>
+        <div className="modal-dialog modal-lg">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">{selectedCountry.name.common}</h5>
+              <button type="button" className="close" onClick={() => setShowModal(false)}>
+                <span>&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <div className="col-md-6">
+                  <img src={selectedCountry.flags.png} alt={`Flag of ${selectedCountry.name.common}`} className="img-fluid mb-3" />
+                  <p><strong>Capital:</strong> {selectedCountry.capital[0]}</p>
+                  <p><strong>Region:</strong> {selectedCountry.region}</p>
+                  <p><strong>Population:</strong> {selectedCountry.population}</p>
+                  <p><strong>Area:</strong> {selectedCountry.area} km<sup>2</sup></p>
+                  <p><strong>Timezone:</strong> {selectedCountry.timezones[0]}</p>
+                  <p><strong>Currency:</strong> {Object.keys(selectedCountry.currencies)[0]}</p>
+                  <p><strong>Language:</strong> {selectedCountry.languages[Object.keys(selectedCountry.languages)[0]]}</p>
+                  <p><strong>Calling Code:</strong> {selectedCountry.idd.root + selectedCountry.idd.suffixes[0]}</p>
+                  <p><strong>Sub Region:</strong> {selectedCountry.subregion}</p>
+                  <p><strong>Demonym:</strong> {selectedCountry.demonyms.eng.m}</p>
+                </div>
+
+                <div className="col-md-6">
+                  <iframe
+                    width="100%"
+                    height="250"
+                    src={`https://maps.google.com/maps?q=${selectedCountry.latlng[0]},${selectedCountry.latlng[1]}&z=6&output=embed`}
+                    title={`Map of ${selectedCountry.name.common}`}
+                  ></iframe>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
 
   return (
     <div className="App container-fluid">
@@ -175,6 +240,7 @@ function App() {
         <div className="col-md-3"></div>
 
       </div>
+      {renderModal()}
     </div>
   );
 }
