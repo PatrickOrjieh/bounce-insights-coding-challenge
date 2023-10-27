@@ -7,6 +7,21 @@ const PORT = 5000;
 
 app.use(cors());
 
+app.get('/allCountries', (req, res) => {
+    axios.get(`https://restcountries.com/v3.1/all`)
+        .then(response => {
+            if (response.data && response.data.length > 0) {
+                res.json(response.data);
+            } else {
+                res.status(404).json({ error: "Countries not found" });
+            }
+        })
+        .catch(error => {
+            res.status(500).json({ error: "Error fetching countries data" });
+        });
+});
+
+
 app.get('/country/:name', (req, res) => {
     const countryName = req.params.name;
 

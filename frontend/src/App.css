@@ -34,3 +34,15 @@
   object-fit: cover;
 }
 
+.search{
+  background-color: #152737;
+  outline: none;
+  border: none;
+}
+
+.search:hover{
+  background-color: #ffffff;
+  color: #152737;
+  border: 1px solid #152737;
+}
+

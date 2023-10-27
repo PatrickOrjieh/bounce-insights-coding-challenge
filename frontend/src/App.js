@@ -19,6 +19,21 @@ function App() {
     });
   }, []);
 
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    axios.get(`http://localhost:5000/allCountries`)
+      .then(response => {
+        setCountryData(response.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError("Error fetching data. Please try again.");
+        setLoading(false);
+      });
+  }, []);
+  
+
   const handleFilterChange = (e) => {
     setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -99,16 +114,21 @@ function App() {
         </div>
 
         <div className="col-md-6 text-center">
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={country}
-              onChange={handleInputChange}
-              placeholder="Enter country name"
-              className="form-control mb-3"
-            />
-            <button type="submit" className="btn btn-primary">Search</button>
+          <form onSubmit={handleSubmit} className="d-flex justify-content-between">
+            <div className="col-md-10 p-0">
+              <input
+                type="text"
+                value={country}
+                onChange={handleInputChange}
+                placeholder="Enter country name"
+                className="form-control"
+              />
+            </div>
+            <div className="col-md-2">
+              <button type="submit" className="btn btn-primary ml-2 search">Search</button>
+            </div>
           </form>
+
           <div className="row mt-4">
             {countryData.map(country => (
               <div className="col-md-4 mb-3" key={country.name.common}>
