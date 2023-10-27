@@ -14,10 +14,12 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
 
+  const BACKEND_URL = 'https://bounceinightsapi-500f06ae0a94.herokuapp.com';
+
   useEffect(() => {
     setLoading(true);
     setError(null);
-    axios.get(`http://localhost:5000/allCountries`)
+    axios.get(`${BACKEND_URL}/allCountries`)
       .then(response => {
         setCountryData(response.data);
         setLoading(false);
@@ -49,7 +51,7 @@ function App() {
     setError(null);
     if (country.trim() === '') {
       // Fetch all countries if input is empty
-      axios.get(`http://localhost:5000/allCountries`)
+      axios.get(`${BACKEND_URL}/allCountries`)
         .then(response => {
           setCountryData(response.data);
           setLoading(false);
@@ -62,7 +64,7 @@ function App() {
         
     } else {
       // Fetch specific country
-      axios.get(`http://localhost:5000/country/${country}`)
+      axios.get(`${BACKEND_URL}/country/${country}`)
         .then(response => {
           setCountryData(response.data);
           setLoading(false);
@@ -85,7 +87,7 @@ function App() {
     setLoading(true);
     setError(null);
 
-    axios.get(`http://localhost:5000/countriesByLetter/${letter}`)
+    axios.get(`${BACKEND_URL}/countriesByLetter/${letter}`)
       .then(response => {
         setCountryData(response.data);
         setLoading(false);
